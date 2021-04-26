@@ -27,14 +27,21 @@ typedef Eigen::GpuDevice GPUDevice;
 
 // Define the CUDA kernel.
 template <typename T>
-__global__ void SmallDCudaKernel(const int size, const int j, const T* beta, const T* w, T* sincos, T* out) {
+__global__ void SmallDSinCosCudaKernel(const int size, const int j, const T* beta, T* sincos) {
   auto n = (j+1);
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
        i += blockDim.x * gridDim.x) {
+        auto sa = sin(beta[i]/2);
+        auto ca = cos(beta[i]/2);
         for (int l=0;l<n;l++){
-            sincos[i*n + l] = pow(sin( beta[i]/2),l) *pow(cos(beta[i]/2), j-l);
+            sincos[i*n + l] = pow(sa,l) *pow(ca, j-l);
         }
     }
+}
+
+template <typename T>
+__global__ void SmallDCudaKernel(const int size, const int j, const T* w, const T* sincos, T* out) {
+  auto n = (j+1);
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
        i += blockDim.x * gridDim.x) {
         for (int j1=0;j1<n;j1++){
@@ -48,6 +55,7 @@ __global__ void SmallDCudaKernel(const int size, const int j, const T* beta, con
   }
 }
 
+
 // Define the GPU implementation that launches the CUDA kernel.
 template <typename T>
 struct SmallDFunctor<GPUDevice, T> {
@@ -58,8 +66,10 @@ struct SmallDFunctor<GPUDevice, T> {
     // block count and thread_per_block count.
     int block_count = 1024;
     int thread_per_block = 20;
+    SmallDSinCosCudaKernel<T>
+        <<<block_count, thread_per_block, 0, d.stream()>>>(size, j, in, sincos);
     SmallDCudaKernel<T>
-        <<<block_count, thread_per_block, 0, d.stream()>>>(size, j, in, w, sincos, out);
+        <<<block_count, thread_per_block, 0, d.stream()>>>(size, j, w, sincos, out);
   }
 };
 

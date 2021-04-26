@@ -32,8 +32,10 @@ template <typename T> struct SmallDFunctor<CPUDevice, T> {
                   T *sincos, T *out) {
     auto n = (j + 1);
     for (int i = 0; i < size; ++i) {
+      auto sa = sin(in[i] / 2);
+      auto ca = cos(in[i] / 2);
       for (int l = 0; l < n; l++) {
-        sincos[i * n + l] = pow(sin(in[i] / 2), l) * pow(cos(in[i] / 2), j - l);
+        sincos[i * n + l] = pow(sa, l) * pow(ca, j - l);
       }
     }
     for (int i = 0; i < size; ++i) {
