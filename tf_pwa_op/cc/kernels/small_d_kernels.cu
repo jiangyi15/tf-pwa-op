@@ -31,8 +31,8 @@ __global__ void SmallDSinCosCudaKernel(const int size, const int j, const T* bet
   auto n = (j+1);
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
        i += blockDim.x * gridDim.x) {
-        auto sa = sin(beta[i]/2);
-        auto ca = cos(beta[i]/2);
+        T sa = sin(beta[i]/2);
+        T ca = cos(beta[i]/2);
         for (int l=0;l<n;l++){
             sincos[i*n + l] = pow(sa,l) *pow(ca, j-l);
         }

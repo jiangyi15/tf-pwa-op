@@ -16,4 +16,4 @@
 
 from __future__ import absolute_import
 
-from tf_pwa_op.python.ops.small_d_ops import small_d
+from tf_pwa_op.python.ops.small_d_ops import small_d, delta_D

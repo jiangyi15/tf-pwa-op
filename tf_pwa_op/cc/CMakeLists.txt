@@ -18,10 +18,12 @@ cmake_minimum_required(VERSION 3.8)
 set(customop_files
 	kernels/small_d_kernels.cc
 	kernels/small_d_kernels.cu
+	kernels/Delta_D_kernels.cc
+	kernels/Delta_D_kernels.cu
     ops/small_d_ops.cc
 )
 
-# add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 add_definitions(-DGOOGLE_CUDA=1)
 add_definitions(-DNDEBUG)
 

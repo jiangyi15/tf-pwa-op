@@ -22,8 +22,10 @@ import functools
 import math
 import numpy as np
 
+import tensorflow as tf
 from tensorflow.python.framework import load_library
 from tensorflow.python.platform import resource_loader
+
 
 small_d_ops = load_library.load_op_library(
     resource_loader.get_path_to_datafile('libpwa_op.so'))
@@ -61,3 +63,12 @@ def small_d_weight(j):  # the prefactor in the d-function of β
                 tmp /= f(j - m - k) * f(j + n - k) * f(k + m - n) * f(k)
                 ret[l][(m + j) // 2][(n + j) // 2] = tmp
     return ret
+
+def delta_D(alpha, beta, gamma, j, la, lb, lc):
+    w = small_d_weight(j)
+    d = small_d(beta, j)
+    la = [int(i*2+0.1) for i in la]
+    lb = [int(i*2+0.1) for i in lb]
+    lc = [int(i*2+0.1) for i in lc]
+    x, y = small_d_ops.DeltaD(small_d=d, alpha=alpha, gamma=gamma, la=la, lb=lb, lc=lc, j=j)
+    return tf.complex(x, y)

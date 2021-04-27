@@ -26,6 +26,39 @@ REGISTER_OP("SmallD")
     .Output("sincos: T")
     .Attr("j: int")
     .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
-      c->set_output(0, c->input(0));
+      int j;
+      TF_RETURN_IF_ERROR(c->GetAttr("j", &j));
+      auto shape = c->input(0);
+      auto seq_length = c->Dim(shape, 0);
+      auto output_shape1 = c->MakeShape({seq_length, j+1, j+1});
+      auto output_shape2 = c->MakeShape({seq_length, j+1});
+      c->set_output(0, output_shape1);
+      c->set_output(1, output_shape2);
+      return Status::OK();
+    });
+
+
+REGISTER_OP("DeltaD")
+    .Attr("T: {float, double}")
+    .Input("small_d: T")
+    .Input("alpha: T")
+    .Input("gamma: T")
+    .Input("la: int32")
+    .Input("lb: int32")
+    .Input("lc: int32")
+    .Output("ret1: T")
+    .Output("ret2: T")
+    .Attr("j: int")
+    .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
+      int j;
+      TF_RETURN_IF_ERROR(c->GetAttr("j", &j));
+      auto shape = c->input(0);
+      auto seq_length = c->Dim(shape, 0);
+      auto na = c->Dim(c->input(3), 0);
+      auto nb = c->Dim(c->input(4), 0);
+      auto nc = c->Dim(c->input(5), 0);
+      auto output_shape1 = c->MakeShape({seq_length, na, nb, nc});
+      c->set_output(0, output_shape1);
+      c->set_output(1, output_shape1);
       return Status::OK();
     });

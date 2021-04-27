@@ -21,7 +21,7 @@ find_package(CUDA 10.1 REQUIRED)
 
 set(CUDA_PATH ${CUDA_TOOLKIT_ROOT_DIR})
 
-set(TF_PATH "/mnt/e/conda/lib/python3.8/site-packages/tensorflow" CACHE STRING "TensorFlow path")
+set(TF_PATH "/home/ccnu_tfpwa/miniconda3/lib/python3.8/site-packages/tensorflow" CACHE STRING "TensorFlow path")
 
 if(NOT TF_PATH)
   message(FATAL_ERROR "TF_PATH must be set.")
@@ -33,7 +33,7 @@ set(GPU_ARCHS "" CACHE STRING
   "List of GPU architectures (semicolon-separated) to be compiled for.")
 
 if("${GPU_ARCHS}" STREQUAL "")
-	set(GPU_ARCHS "75")
+	set(GPU_ARCHS "70")
 endif()
 
 foreach(arch ${GPU_ARCHS})
