@@ -27,8 +27,8 @@ typedef Eigen::GpuDevice GPUDevice;
 
 // Define the CUDA kernel.
 template <typename T>
-__global__ void DeltaDCudaKernel(const int size, const int j, const T* small_d, 
-        const T* alpha, 
+__global__ void DeltaDCudaKernel(const int size, const int j, const T* small_d,
+        const T* alpha,
         const T* gamma,
         const int* la,
         const int* lb,
@@ -40,18 +40,19 @@ __global__ void DeltaDCudaKernel(const int size, const int j, const T* small_d,
   auto n = (j+1);
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
        i += blockDim.x * gridDim.x) {
-        for (int ja = 0; ja < na; ja++) {
+     for (int ja = 0; ja < na; ja++) {
         for (int jb = 0; jb < nb; jb++) {
         for (int jc = 0; jc < nc; jc++) {
           out_r[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = 0.0;
           out_i[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = 0.0;
-          if (abs(lb[jb] - lc[jc]) <= j) {
+          int ib = lb[jb];
+          int ic = lc[jc];
+          int delta = ib -ic;
+          if (abs(delta) <= j) {
               int ia = la[ja];
-              int ib = lb[jb];
-              int ic = lc[jc];
-              int idx = i*n*n + (ia+j)*n/2 + (ib-ic+j)/2;
+              int idx = i*n*n + (ia+j)*n/2 + (delta+j)/2;
               T tmp = small_d[idx];
-              T theta = 0.5*(ia * alpha[i] + (lb[jb] - lc[jc]) * gamma[i]);
+              T theta = 0.5*(ia * alpha[i] + delta * gamma[i]);
               out_r[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = cos(theta) * tmp;
               out_i[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = sin(theta) * tmp;
           }
@@ -65,8 +66,8 @@ __global__ void DeltaDCudaKernel(const int size, const int j, const T* small_d,
 // Define the GPU implementation that launches the CUDA kernel.
 template <typename T>
 struct DeltaDFunctor<GPUDevice, T> {
-  void operator()(const GPUDevice& d, int size, int j, const T* small_d, 
-        const T* alpha, 
+  void operator()(const GPUDevice& d, int size, int j, const T* small_d,
+        const T* alpha,
         const T* gamma,
         const int* la,
         const int* lb,

@@ -65,10 +65,12 @@ def small_d_weight(j):  # the prefactor in the d-function of β
     return ret
 
 def delta_D(alpha, beta, gamma, j, la, lb, lc):
+    j = int(j*2+0.1)
     w = small_d_weight(j)
     d = small_d(beta, j)
-    la = [int(i*2+0.1) for i in la]
-    lb = [int(i*2+0.1) for i in lb]
-    lc = [int(i*2+0.1) for i in lc]
+    la = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in la]
+    lb = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in lb]
+    lc = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in lc]
+    print(j, la, lb, lc)
     x, y = small_d_ops.DeltaD(small_d=d, alpha=alpha, gamma=gamma, la=la, lb=lb, lc=lc, j=j)
     return tf.complex(x, y)

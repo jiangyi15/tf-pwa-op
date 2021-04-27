@@ -23,7 +23,7 @@ set(customop_files
     ops/small_d_ops.cc
 )
 
-add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+# add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 add_definitions(-DGOOGLE_CUDA=1)
 add_definitions(-DNDEBUG)
 
@@ -38,6 +38,11 @@ target_link_libraries(pwa_op PRIVATE
   -lcudart
   -l:libtensorflow_framework.so.2
   ${CMAKE_THREAD_LIBS_INIT}
+)
+
+target_include_directories(
+  pwa_op PRIVATE
+  ${TF_PATH}/include
 )
 
 set_target_properties(pwa_op PROPERTIES
