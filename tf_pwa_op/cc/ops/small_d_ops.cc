@@ -62,3 +62,28 @@ REGISTER_OP("DeltaD")
       c->set_output(1, output_shape1);
       return Status::OK();
     });
+
+
+REGISTER_OP("MonmentLambda")
+    .Attr("T: {float, double}")
+    .Input("m0: T")
+    .Input("m1: T")
+    .Input("m2: T")
+    .Output("ret1: T")
+    .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
+      c->set_output(0, c->input(0));
+      return Status::OK();
+    });
+
+
+REGISTER_OP("MonmentLambdaGradient")
+    .Attr("T: {float, double}")
+    .Input("m0: T")
+    .Input("m1: T")
+    .Input("m2: T")
+    .Output("ret1: T")
+    .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
+      c->set_output(0, c->input(0));
+      return Status::OK();
+    });
+  

@@ -30,10 +30,13 @@ from tensorflow.python.platform import resource_loader
 small_d_ops = load_library.load_op_library(
     resource_loader.get_path_to_datafile('libpwa_op.so'))
 
+import nvtx.plugins.tf as tf_nvtx
 
 def small_d(beta, j):
+    beta, d_id = tf_nvtx.ops.start(beta, "small_d_matrix")
     w = small_d_weight(j)
     a, b = small_d_ops.small_d(beta, w, j)
+    a = tf_nvtx.ops.end(a, d_id)
     return a
 
 
@@ -71,6 +74,50 @@ def delta_D(alpha, beta, gamma, j, la, lb, lc):
     la = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in la]
     lb = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in lb]
     lc = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in lc]
-    print(j, la, lb, lc)
+    # print(j, la, lb, lc)
     x, y = small_d_ops.DeltaD(small_d=d, alpha=alpha, gamma=gamma, la=la, lb=lb, lc=lc, j=j)
     return tf.complex(x, y)
+
+
+@tf.custom_gradient
+def momentum_lambda(m0, m1, m2):
+
+    """
+.. math:
+   \\lambda(a, b, c) = (a^2 - (b+c)^2)(a^2 - (b-c)^2)
+
+.. math:
+   \\frac{\\partial \\lambda(x, y,z )}{\\partial x } = 4 x (x^2 - y^2-  z^2)
+
+    """
+    def grad(g):
+        return [ g * momentum_lambda_grad(m0, m1, m2),
+                 g * momentum_lambda_grad(m1, m2, m0),
+                 g * momentum_lambda_grad(m2, m0, m1)]
+    x = small_d_ops.MonmentLambda(m0=m0, m1=m1, m2=m2)
+    return x, grad
+
+@tf.custom_gradient
+def momentum_lambda_grad(m0, m1, m2):
+    def grad(g):
+        return [ g * (12*m0*m0-4*(m1*m1-m2*m2)),
+                 g *(-8*m0*m1),
+                 g * (-8*m0*m1)]
+    x = small_d_ops.MonmentLambdaGradient(m0=m0, m1=m1, m2=m2)
+    return x, grad
+
+def get_relative_p2(m0, m1, m2):
+    m0 = tf.convert_to_tensor(m0)
+    m1 = tf.convert_to_tensor(m1)
+    m2 = tf.convert_to_tensor(m2)
+    shape = tf.broadcast_dynamic_shape(tf.broadcast_dynamic_shape(m0.shape, m1.shape), m2.shape)
+
+    m0, m1, m2 = [ tf.broadcast_to(i, shape) for i in [m0,m1,m2]]
+    if any([i.dtype == tf.float64 for i in [m0, m1, m2]]):
+        m0, m1, m2 = [tf.cast(i, tf.float64) for i in [m0, m1, m2]]
+
+    y = momentum_lambda(m0, m1, m2)
+    return y/4/(m0*m0)
+
+def get_relative_p(m0, m1, m2):
+    return tf.sqrt(get_relative_p2(m0, m1, m2))

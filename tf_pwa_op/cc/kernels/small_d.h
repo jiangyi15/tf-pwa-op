@@ -25,6 +25,18 @@ template <typename Device, typename T> struct DeltaDFunctor {
         );
 };
 
+template <typename Device, typename T> struct MonmentLambdaFunctor {
+  void operator()(const Device &d, int size, const T* m0, 
+        const T* m1,
+        const T* m2, T* out);
+};
+
+template <typename Device, typename T> struct  MonmentLambdaGradFunctor {
+  void operator()(const Device &d, int size, const T* m0, 
+        const T* m1,
+        const T* m2, T*out);
+};
+
 } // namespace functor
 
 } // namespace tensorflow

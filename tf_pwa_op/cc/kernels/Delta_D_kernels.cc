@@ -83,7 +83,7 @@ public:
     auto nb = lb.dim_size(0);
     auto nc = lc.dim_size(0);
 
-    std::cout << na << nb << nc << std::endl;
+    // std::cout << na << nb << nc << std::endl;
 
     // Create an output tensor
     Tensor *output_r_tensor = NULL;
@@ -99,7 +99,7 @@ public:
     //                &small_d_tensor));
     auto shape2 = alpha.shape();
 
-    std::cout << na << nb << nc << std::endl;
+    // std::cout << na << nb << nc << std::endl;
     shape2.AddDim(na);
     shape2.AddDim(nb);
     shape2.AddDim(nc);
