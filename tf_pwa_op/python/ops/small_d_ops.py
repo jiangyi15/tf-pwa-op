@@ -121,3 +121,14 @@ def get_relative_p2(m0, m1, m2):
 
 def get_relative_p(m0, m1, m2):
     return tf.sqrt(get_relative_p2(m0, m1, m2))
+
+def blattweisskopf(l, q, q0, d=3.0):
+    q = tf.convert_to_tensor(q)
+    q0 = tf.convert_to_tensor(q0)
+    shape = tf.broadcast_dynamic_shape(q.shape, q0.shape)
+
+    q, q0 = [ tf.broadcast_to(i, shape) for i in [q, q0]]
+    if any([i.dtype == tf.float64 for i in [q, q0]]):
+        q, q0 = [tf.cast(i, tf.float64) for i in q, q0]
+
+    return small_d_ops.BlattWeisskopfBarrierFactor(l=l, q=q, q0=q0, d=d)

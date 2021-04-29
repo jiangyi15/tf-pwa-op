@@ -22,6 +22,8 @@ set(customop_files
 	kernels/Delta_D_kernels.cu
 	kernels/monment_lambda_kernels.cc
 	kernels/monment_lambda_kernels.cu
+  kernels/blatt_weisskopf_barrier_factor_kernels.cc
+  kernels/blatt_weisskopf_barrier_factor_kernels.cu
     ops/small_d_ops.cc
 )
 

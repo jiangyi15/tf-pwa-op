@@ -19,6 +19,7 @@ limitations under the License.
 
 #include "small_d.h"
 #include "tensorflow/core/util/gpu_kernel_helper.h"
+#include <assert.h>
 
 namespace tensorflow {
 namespace functor {
@@ -26,6 +27,42 @@ namespace functor {
 typedef Eigen::GpuDevice GPUDevice;
 
 // Define the CUDA kernel.
+//template <typename T>
+//__global__ void DeltaDCudaKernel(const int size, const int j, const T* small_d,
+//        const T* alpha,
+//        const T* gamma,
+//        const int* la,
+//        const int* lb,
+//        const int* lc,
+//        T* out_r,
+//        T* out_i,
+//        const int na, const int nb, const int nc
+//        ) {
+//  auto n = (j+1);
+//  for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
+//       i += blockDim.x * gridDim.x) {
+//     for (int ja = 0; ja < na; ja++) {
+//        for (int jb = 0; jb < nb; jb++) {
+//        for (int jc = 0; jc < nc; jc++) {
+//          out_r[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = 0.0;
+//          out_i[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = 0.0;
+//          int ib = lb[jb];
+//          int ic = lc[jc];
+//          int delta = ib -ic;
+//          if (abs(delta) <= j) {
+//              int ia = la[ja];
+//              int idx = i*n*n + (ia+j)*n/2 + (delta+j)/2;
+//              T tmp = small_d[idx];
+//              T theta = 0.5*(ia * alpha[i] + delta * gamma[i]);
+//              out_r[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = cos(theta) * tmp;
+//              out_i[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = sin(theta) * tmp;
+//          }
+//        }
+//      }
+//    }
+//       }
+//}
+
 template <typename T>
 __global__ void DeltaDCudaKernel(const int size, const int j, const T* small_d,
         const T* alpha,
@@ -38,30 +75,33 @@ __global__ void DeltaDCudaKernel(const int size, const int j, const T* small_d,
         const int na, const int nb, const int nc
         ) {
   auto n = (j+1);
-  for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
-       i += blockDim.x * gridDim.x) {
-     for (int ja = 0; ja < na; ja++) {
-        for (int jb = 0; jb < nb; jb++) {
-        for (int jc = 0; jc < nc; jc++) {
-          out_r[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = 0.0;
-          out_i[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = 0.0;
-          int ib = lb[jb];
-          int ic = lc[jc];
-          int delta = ib -ic;
-          if (abs(delta) <= j) {
-              int ia = la[ja];
-              int idx = i*n*n + (ia+j)*n/2 + (delta+j)/2;
-              T tmp = small_d[idx];
-              T theta = 0.5*(ia * alpha[i] + delta * gamma[i]);
-              out_r[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = cos(theta) * tmp;
-              out_i[i * na * nb*nc + ja * nb*nc + jb*nc + jc] = sin(theta) * tmp;
-          }
-        }
-      }
-    }
-       }
-}
 
+  int jc = threadIdx.x % nc;
+  int jb = (threadIdx.x / nc) % nb;
+  int ja = threadIdx.x / nc / nb;
+  int i = blockIdx.x;
+  int id = i * na * nb*nc + ja * nb*nc + jb*nc + jc;
+
+  int ib = lb[jb];
+  int ic = lc[jc];
+  int delta = ib -ic;
+
+  T outr = 0.0;
+  T outi = 0.0;
+
+  if (abs(delta) <= j) {
+      int ia = la[ja];
+      int idx = i*n*n + (ia+j)*n/2 + (delta+j)/2;
+      T tmp = small_d[idx];
+      T theta = 0.5*(ia * alpha[i] + delta * gamma[i]);
+      outr = cos(theta) * tmp;
+      outi = sin(theta) * tmp;
+  }
+
+  out_r[id] = outr;
+  out_i[id] = outi;
+
+}
 
 // Define the GPU implementation that launches the CUDA kernel.
 template <typename T>
@@ -80,10 +120,17 @@ struct DeltaDFunctor<GPUDevice, T> {
     //
     // See core/util/cuda_kernel_helper.h for example of computing
     // block count and thread_per_block count.
-    int block_count = 1024;
-    int thread_per_block = 20;
-    DeltaDCudaKernel<T>
-        <<<block_count, thread_per_block, 0, d.stream()>>>(size, j, small_d, alpha, gamma, la, lb, lc, out_r, out_i, na, nb, nc);
+    //int block_count = 1024;
+    //int thread_per_block = 20;
+    //DeltaDCudaKernel<T>
+    //    <<<block_count, thread_per_block, 0, d.stream()>>>(size, j, small_d, alpha, gamma, la, lb, lc, out_r, out_i, na, nb, nc);
+
+    assert(na * nb * nc <= 1024);
+    int block_count = size;
+    int thread_per_block = na * nb * nc;
+
+    DeltaDCudaKernel
+        <<<block_count, thread_per_block>>>(size, j, small_d, alpha, gamma, la, lb, lc, out_r, out_i, na, nb, nc);
   }
 };
 
