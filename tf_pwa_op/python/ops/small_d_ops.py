@@ -65,15 +65,21 @@ def small_d_weight(j):  # the prefactor in the d-function of β
                 )
                 tmp /= f(j - m - k) * f(j + n - k) * f(k + m - n) * f(k)
                 ret[l][(m + j) // 2][(n + j) // 2] = tmp
-    return ret
+    return tf.convert_to_tensor(ret)
+
+@functools.lru_cache()
+def _cached_li(li):
+    ret = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in li]
+    return tf.convert_to_tensor(ret)
+
 
 def delta_D(alpha, beta, gamma, j, la, lb, lc):
     j = int(j*2+0.1)
     w = small_d_weight(j)
     d = small_d(beta, j)
-    la = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in la]
-    lb = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in lb]
-    lc = [int(int(abs(i)*2+0.1) * np.sign(i)) for i in lc]
+    la = _cached_li(la)
+    lb = _cached_li(lb)
+    lc = _cached_li(lc)
     # print(j, la, lb, lc)
     x, y = small_d_ops.DeltaD(small_d=d, alpha=alpha, gamma=gamma, la=la, lb=lb, lc=lc, j=j)
     return tf.complex(x, y)
