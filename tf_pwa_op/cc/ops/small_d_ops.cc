@@ -117,21 +117,21 @@ REGISTER_OP("BlattWeisskopfBarrierFactor")
 // });
 
 
-REGISTER_OP("BlattWeisskopfBarrierFactor_hess_q0")
-    .Attr("T: {float, double}")
-    .Input("l: int32")
-    .Input("q: T")
-    .Input("q0: T")
-    .Input("value: T")
-    .Input("grad: T")
-    .Input("value_grad: T")
-    .Input("grad_grad: T")
-    .Attr("d: T")
-    .Output("out: T")
-    .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
-      c->set_output(0, c->input(1));
-      return Status::OK();
-});
+// REGISTER_OP("BlattWeisskopfBarrierFactor_hess_q0")
+//     .Attr("T: {float, double}")
+//     .Input("l: int32")
+//     .Input("q: T")
+//     .Input("q0: T")
+//     .Input("value: T")
+//     .Input("grad: T")
+//     .Input("value_grad: T")
+//     .Input("grad_grad: T")
+//     .Attr("d: T")
+//     .Output("out: T")
+//     .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
+//       c->set_output(0, c->input(1));
+//       return Status::OK();
+// });
 
 
 

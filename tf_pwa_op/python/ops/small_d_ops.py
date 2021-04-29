@@ -129,6 +129,6 @@ def blattweisskopf(l, q, q0, d=3.0):
 
     q, q0 = [ tf.broadcast_to(i, shape) for i in [q, q0]]
     if any([i.dtype == tf.float64 for i in [q, q0]]):
-        q, q0 = [tf.cast(i, tf.float64) for i in q, q0]
+        q, q0 = [tf.cast(i, tf.float64) for i in [q, q0]]
 
     return small_d_ops.BlattWeisskopfBarrierFactor(l=l, q=q, q0=q0, d=d)

@@ -39,7 +39,7 @@ template <typename Device, typename T> struct  MonmentLambdaGradFunctor {
 
 
 template <typename Device, typename T> struct BlattWeisskopfFunctor {
-  void operator()(const Device &device,const int size,const int nl,const T d, const int* l, 
+  void operator()(const Device &device,const int size,const int nl,const float d, const int* l, 
         const T* q,
         const T* q0, T* out);
 };
