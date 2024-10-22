@@ -13,8 +13,8 @@ template <typename Device, typename T> struct SmallDFunctor {
 };
 
 template <typename Device, typename T> struct DeltaDFunctor {
-  void operator()(const Device &d, int size, int j, const T* small_d, 
-        const T* alpha, 
+  void operator()(const Device &d, int size, int j, const T* small_d,
+        const T* alpha,
         const T* gamma,
         const int* la,
         const int* lb,
@@ -26,20 +26,20 @@ template <typename Device, typename T> struct DeltaDFunctor {
 };
 
 template <typename Device, typename T> struct MonmentLambdaFunctor {
-  void operator()(const Device &d, int size, const T* m0, 
+  void operator()(const Device &d, int size, const T* m0,
         const T* m1,
         const T* m2, T* out);
 };
 
 template <typename Device, typename T> struct  MonmentLambdaGradFunctor {
-  void operator()(const Device &d, int size, const T* m0, 
+  void operator()(const Device &d, int size, const T* m0,
         const T* m1,
         const T* m2, T*out);
 };
 
 
 template <typename Device, typename T> struct BlattWeisskopfFunctor {
-  void operator()(const Device &device,const int size,const int nl,const float d, const int* l, 
+  void operator()(const Device &device,const int size,const int nl,const float d, const int* l,
         const T* q,
         const T* q0, T* out);
 };

@@ -51,7 +51,7 @@ template <typename Device, typename T> class MonmentLambdaOp : public OpKernel {
 public:
 explicit MonmentLambdaOp(OpKernelConstruction *context) : OpKernel(context) {
   }
-  
+
   void Compute(OpKernelContext *context) override {
     // Grab the input tensor
     const Tensor &m0 = context->input(0); // (n,)
@@ -109,7 +109,7 @@ public:
   REGISTER_KERNEL_BUILDER(                                                     \
       Name("MonmentLambda").Device(DEVICE_CPU).TypeConstraint<T>("T"),                \
       MonmentLambdaOp<CPUDevice, T>);
-  
+
 REGISTER_CPU(float);
 REGISTER_CPU(double);
 #undef REGISTER_CPU
@@ -132,7 +132,7 @@ REGISTER_GPU(double);
   REGISTER_KERNEL_BUILDER(                                                     \
       Name("MonmentLambdaGradient").Device(DEVICE_CPU).TypeConstraint<T>("T"),                \
       MonmentLambdaGradOp<CPUDevice, T>);
-  
+
 REGISTER_CPU(float);
 REGISTER_CPU(double);
 #undef REGISTER_CPU

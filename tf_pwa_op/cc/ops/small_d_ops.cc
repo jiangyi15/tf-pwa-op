@@ -132,7 +132,3 @@ REGISTER_OP("BlattWeisskopfBarrierFactor")
 //       c->set_output(0, c->input(1));
 //       return Status::OK();
 // });
-
-
-
-
