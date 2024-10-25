@@ -37,7 +37,7 @@ T blattweisskopf_f(const T z, const int l) {
     case 4: return sqrt(z*(z*(z*(z+1)+2)+3)+4);
     case 5: return sqrt(z*(z*(z*(z*(z+1)+2)+3)+4)+5);
     default: return 1.0;
-  } 
+  }
 }
 
 // CPU specialization of actual computation.
@@ -62,7 +62,7 @@ explicit BlattWeisskopfOp(OpKernelConstruction *context) : OpKernel(context) {
 
     OP_REQUIRES_OK(context, context->GetAttr("d", &d_));
   }
-  
+
   void Compute(OpKernelContext *context) override {
     // Grab the input tensor
     const Tensor &l = context->input(0); // (m,)
@@ -96,7 +96,7 @@ explicit BlattWeisskopfOp(OpKernelConstruction *context) : OpKernel(context) {
   REGISTER_KERNEL_BUILDER(                                                     \
       Name("BlattWeisskopfBarrierFactor").Device(DEVICE_CPU).TypeConstraint<T>("T"),                \
       BlattWeisskopfOp<CPUDevice, T>);
-  
+
 REGISTER_CPU(float);
 REGISTER_CPU(double);
 #undef REGISTER_CPU

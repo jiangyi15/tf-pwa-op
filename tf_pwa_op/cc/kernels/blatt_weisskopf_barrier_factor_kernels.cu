@@ -25,7 +25,7 @@ namespace functor {
 
 typedef Eigen::GpuDevice GPUDevice;
 
-template <typename T> 
+template <typename T>
 __device__ T blattweisskopf_f(const T z, const int l){
    switch (l) {
     case 0: return 1;
@@ -35,7 +35,7 @@ __device__ T blattweisskopf_f(const T z, const int l){
     case 4: return sqrt(z*(z*(z*(z+1)+2)+3)+4);
     case 5: return sqrt(z*(z*(z*(z*(z+1)+2)+3)+4)+5);
     default: return 1.0;
-  } 
+  }
 }
 
 // Define the CUDA kernel.
