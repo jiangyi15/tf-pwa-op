@@ -9,7 +9,7 @@ jobs:
       max-parallel: 5
     defaults:
       run:
-        shell: bash -el {0}
+        shell: bash -el {0}   # start bash with conda
     steps:
     - uses: actions/checkout@v4
     - uses: conda-incubator/setup-miniconda@v3
@@ -18,12 +18,9 @@ jobs:
         python-version: 3.11
     - name: Install dependencies
       run: |
-        conda install cmake tensorflow cuda-minimal-build
-    - name: Conda info
-      run: conda list
+        conda install tensorflow[build=cuda*] cuda-minimal-build
     - name: build so file
       run: |
-        conda info
         mkdir build
         cd build
         cmake ..
