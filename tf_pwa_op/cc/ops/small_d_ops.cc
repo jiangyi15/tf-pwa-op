@@ -18,7 +18,8 @@ limitations under the License.
 
 using namespace tensorflow;
 
-#define STATUS_OK absl::OkStatus()
+// start from tf 2.10
+#define STATUS_OK OkStatus()
 
 REGISTER_OP("SmallD")
     .Attr("T: {float, double}")
