@@ -20,7 +20,7 @@ jobs:
       run: |
         conda install tensorflow cuda-minimal-build
     - name: set gpu link to build without gpu
-      run:
+      run: |
         mkdir -p third_party/gpus/cuda/
         ln -s $(dirname `which python`)/../targets/x86_64-linux/include third_party/gpus/cuda/include
     - name: build so file
