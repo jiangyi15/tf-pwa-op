@@ -30,13 +30,13 @@ from tensorflow.python.platform import resource_loader
 small_d_ops = load_library.load_op_library(
     resource_loader.get_path_to_datafile('libpwa_op.so'))
 
-import nvtx.plugins.tf as tf_nvtx
+# import nvtx.plugins.tf as tf_nvtx
 
 def small_d(beta, j):
-    beta, d_id = tf_nvtx.ops.start(beta, "small_d_matrix")
+#    beta, d_id = tf_nvtx.ops.start(beta, "small_d_matrix")
     w = small_d_weight(j)
     a, b = small_d_ops.small_d(beta, w, j)
-    a = tf_nvtx.ops.end(a, d_id)
+#    a = tf_nvtx.ops.end(a, d_id)
     return a
 
 

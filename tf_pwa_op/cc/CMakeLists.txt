@@ -38,8 +38,8 @@ set_target_properties(pwa_op PROPERTIES
 		CUDA_RESOLVE_DEVICE_SYMBOLS ON
 )
 target_link_libraries(pwa_op PRIVATE
-  -lcublas
-  -lcudart
+  # -lcublas
+  # -lcudart
   -l:libtensorflow_framework.so.2
   ${CMAKE_THREAD_LIBS_INIT}
 )
@@ -51,3 +51,5 @@ target_include_directories(
 
 set_target_properties(pwa_op PROPERTIES
          LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../python/ops)
+
+set_target_properties(pwa_op PROPERTIES CUDA_ARCHITECTURES "70;72;75;80;86;90")

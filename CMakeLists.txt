@@ -13,11 +13,11 @@
 # limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.20)
 
 project(tf_pwa_op LANGUAGES CXX CUDA)
 
-find_package(CUDA 10.1 REQUIRED)
+find_package(Python REQUIRED)
 
 set(CUDA_PATH ${CUDA_TOOLKIT_ROOT_DIR})
 
@@ -28,24 +28,12 @@ execute_process(COMMAND python -c  "import tensorflow as tf; print(str(tf)[27:-1
                 OUTPUT_VARIABLE TF_PATH)
 
 message(STATUS "using Tensorflow in ${TF_PATH}")
+message(STATUS "python root ${Python_EXECUTABLE}")
+cmake_path(SET PYTHON_EXECUTABLE_PATH ${Python_EXECUTABLE})
+cmake_path(GET PYTHON_EXECUTABLE_PATH PARENT_PATH PYTHON_EXECUTABLE_DIR)
+message(STATUS "python root ${PYTHON_EXECUTABLE_DIR}")
 
 list(APPEND CMAKE_MODULE_PATH ${CUDA_PATH}/lib64)
-
-set(GPU_ARCHS "" CACHE STRING
-  "List of GPU architectures (semicolon-separated) to be compiled for.")
-
-if("${GPU_ARCHS}" STREQUAL "")
-	set(GPU_ARCHS "70")
-endif()
-
-foreach(arch ${GPU_ARCHS})
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_${arch},code=sm_${arch} -rdc=true")
-	if(SM STREQUAL 70 OR SM STREQUAL 75)
-    set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS}    -DWMMA")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}  -DWMMA")
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -DWMMA")
-	endif()
-endforeach()
 
 set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS} ${TF_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${TF_COMPILE_FLAGS}")
@@ -56,16 +44,12 @@ set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG}  -Wall -O0")
 set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -O0 -G -Xcompiler -Wall")
 
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(CMAKE_CXX_STANDARD STREQUAL "11")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --std=c++11")
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -O3")
 
 set(COMMON_HEADER_DIRS
@@ -80,11 +64,13 @@ set(COMMON_LIB_DIRS
 include_directories(
   ${COMMON_HEADER_DIRS}
   ${TF_PATH}/include
+  ${PYTHON_EXECUTABLE_DIR}/../include
 )
 
 link_directories(
   ${COMMON_LIB_DIRS}
   ${TF_PATH}
+  ${PYTHON_EXECUTABLE_DIR}/../lib
 )
 
 add_subdirectory(tf_pwa_op/cc)

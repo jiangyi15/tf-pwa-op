@@ -34,8 +34,8 @@ T blattweisskopf_f(const T z, const int l) {
     case 1: return sqrt(z + 1);
     case 2: return sqrt(z*(z+3)+9);
     case 3: return sqrt(z*(z*(z+6)+45)+225);
-    case 4: return sqrt(z*(z*(z*(z+1)+2)+3)+4);
-    case 5: return sqrt(z*(z*(z*(z*(z+1)+2)+3)+4)+5);
+    case 4: return sqrt(z*(z*(z*(z+10)+135)+1575)+11025);
+    case 5: return sqrt(z*(z*(z*(z*(z+15)+315)+6300)+99225)+893025);
     default: return 1.0;
   }
 }

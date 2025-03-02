@@ -4,13 +4,21 @@ TensorFlow op for TFPWA
 Build
 -----
 
-link to cuda
+0. set up enviromant
+
 ```
-mkdir -p third_party/gpus
-ln -s /usr/local/cuda third_party/gpus/
+conda create -n tf_pwa_op
+conda activate tf_pwa_op
 ```
 
-build so
+1. install build dependences
+
+```
+conda install tensorflow cuda-minimal-build
+```
+
+2. build so file
+
 ```
 mkdir build
 cd build
@@ -18,7 +26,8 @@ cmake ..
 make
 ```
 
-install
+3. install
+
 ```
 pip install -e . --no-deps
 ```

@@ -18,6 +18,8 @@ limitations under the License.
 
 using namespace tensorflow;
 
+#define STATUS_OK absl::OkStatus()
+
 REGISTER_OP("SmallD")
     .Attr("T: {float, double}")
     .Input("beta: T")
@@ -34,7 +36,7 @@ REGISTER_OP("SmallD")
       auto output_shape2 = c->MakeShape({seq_length, j+1});
       c->set_output(0, output_shape1);
       c->set_output(1, output_shape2);
-      return Status::OK();
+      return STATUS_OK;
     });
 
 
@@ -60,7 +62,7 @@ REGISTER_OP("DeltaD")
       auto output_shape1 = c->MakeShape({seq_length, na, nb, nc});
       c->set_output(0, output_shape1);
       c->set_output(1, output_shape1);
-      return Status::OK();
+      return STATUS_OK;
     });
 
 
@@ -72,7 +74,7 @@ REGISTER_OP("MonmentLambda")
     .Output("ret1: T")
     .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
       c->set_output(0, c->input(0));
-      return Status::OK();
+      return STATUS_OK;
     });
 
 
@@ -84,7 +86,7 @@ REGISTER_OP("MonmentLambdaGradient")
     .Output("ret1: T")
     .SetShapeFn([](::tensorflow::shape_inference::InferenceContext *c) {
       c->set_output(0, c->input(0));
-      return Status::OK();
+      return STATUS_OK;
     });
 
 
@@ -99,7 +101,7 @@ REGISTER_OP("BlattWeisskopfBarrierFactor")
       auto seq_length = c->Dim(c->input(1), 0);
       auto nl = c->Dim(c->input(0), 0);
       c->set_output(0, c->MakeShape({seq_length, nl}));
-      return Status::OK();
+      return STATUS_OK;
     });
 
 // REGISTER_OP("BlattWeisskopfBarrierFactor_grad_q0")
