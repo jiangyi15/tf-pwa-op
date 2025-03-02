@@ -7,21 +7,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
-
+    defaults:
+      run:
+        shell: bash -el {0}
     steps:
     - uses: actions/checkout@v4
     - uses: conda-incubator/setup-miniconda@v3
       with:
         activate-environment: tf-pwa-op
         python-version: 3.11
-    - name: Conda info
-      shell: bash -el {0}
-      run: conda info
     - name: Install dependencies
       run: |
         conda install cmake tensorflow cuda-minimal-build
     - name: Conda info
-      shell: bash -el {0}
       run: conda list
     - name: build so file
       run: |
