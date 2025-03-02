@@ -31,32 +31,32 @@ template <typename T> struct MonmentLambdaFunctor<CPUDevice, T> {
   void operator()(const CPUDevice &d, int size, const T *m0, const T *m1,
                   const T *m2, T *out) {
     for (int i = 0; i < size; ++i) {
-      out[i] = (m0[i] *m0[i] - (m1[i]-m2[i])*(m1[i]-m2[i]))*(m0[i] *m0[i] - (m1[i]+m2[i])*(m1[i]+m2[i]));
+      out[i] = (m0[i] * m0[i] - (m1[i] - m2[i]) * (m1[i] - m2[i])) *
+               (m0[i] * m0[i] - (m1[i] + m2[i]) * (m1[i] + m2[i]));
     }
-                  }
+  }
 };
 
 template <typename T> struct MonmentLambdaGradFunctor<CPUDevice, T> {
   void operator()(const CPUDevice &d, int size, const T *m0, const T *m1,
                   const T *m2, T *out) {
     for (int i = 0; i < size; ++i) {
-      out[i] = 4 * m0[i] *(m0[i]*m0[i] - m1[i]*m1[i] -m2[i]*m2[i]);
+      out[i] = 4 * m0[i] * (m0[i] * m0[i] - m1[i] * m1[i] - m2[i] * m2[i]);
     }
-                  }
+  }
 };
 
 // OpKernel definition.
 // template parameter <T> is the datatype of the tensors.
 template <typename Device, typename T> class MonmentLambdaOp : public OpKernel {
 public:
-explicit MonmentLambdaOp(OpKernelConstruction *context) : OpKernel(context) {
-  }
+  explicit MonmentLambdaOp(OpKernelConstruction *context) : OpKernel(context) {}
 
   void Compute(OpKernelContext *context) override {
     // Grab the input tensor
     const Tensor &m0 = context->input(0); // (n,)
-    const Tensor &m1 = context->input(1);     // (n,)
-    const Tensor &m2 = context->input(2);     // (n,)
+    const Tensor &m1 = context->input(1); // (n,)
+    const Tensor &m2 = context->input(2); // (n,)
 
     // Create an output tensor
     Tensor *output_tensor = NULL;
@@ -68,24 +68,23 @@ explicit MonmentLambdaOp(OpKernelConstruction *context) : OpKernel(context) {
     OP_REQUIRES(context, m0.NumElements() <= tensorflow::kint32max,
                 errors::InvalidArgument("Too many elements in tensor"));
     MonmentLambdaFunctor<Device, T>()(
-        context->eigen_device<Device>(),
-        static_cast<int>(m0.NumElements()),
-        m0.flat<T>().data(), m1.flat<T>().data(),
-        m2.flat<T>().data(), output_tensor->flat<T>().data());
+        context->eigen_device<Device>(), static_cast<int>(m0.NumElements()),
+        m0.flat<T>().data(), m1.flat<T>().data(), m2.flat<T>().data(),
+        output_tensor->flat<T>().data());
   }
 };
 
-template <typename Device, typename T> class MonmentLambdaGradOp : public OpKernel {
+template <typename Device, typename T>
+class MonmentLambdaGradOp : public OpKernel {
 public:
-
-  explicit MonmentLambdaGradOp(OpKernelConstruction *context) : OpKernel(context) {
-  }
+  explicit MonmentLambdaGradOp(OpKernelConstruction *context)
+      : OpKernel(context) {}
 
   void Compute(OpKernelContext *context) override {
     // Grab the input tensor
     const Tensor &m0 = context->input(0); // (n,)
-    const Tensor &m1 = context->input(1);     // (n,)
-    const Tensor &m2 = context->input(2);     // (n,)
+    const Tensor &m1 = context->input(1); // (n,)
+    const Tensor &m2 = context->input(2); // (n,)
 
     // Create an output tensor
     Tensor *output_tensor = NULL;
@@ -97,17 +96,16 @@ public:
     OP_REQUIRES(context, m0.NumElements() <= tensorflow::kint32max,
                 errors::InvalidArgument("Too many elements in tensor"));
     MonmentLambdaGradFunctor<Device, T>()(
-        context->eigen_device<Device>(),
-        static_cast<int>(m0.NumElements()),
-        m0.flat<T>().data(), m1.flat<T>().data(),
-        m2.flat<T>().data(), output_tensor->flat<T>().data());
+        context->eigen_device<Device>(), static_cast<int>(m0.NumElements()),
+        m0.flat<T>().data(), m1.flat<T>().data(), m2.flat<T>().data(),
+        output_tensor->flat<T>().data());
   }
 };
 
 // Register the CPU kernels.
 #define REGISTER_CPU(T)                                                        \
   REGISTER_KERNEL_BUILDER(                                                     \
-      Name("MonmentLambda").Device(DEVICE_CPU).TypeConstraint<T>("T"),                \
+      Name("MonmentLambda").Device(DEVICE_CPU).TypeConstraint<T>("T"),         \
       MonmentLambdaOp<CPUDevice, T>);
 
 REGISTER_CPU(float);
@@ -117,20 +115,19 @@ REGISTER_CPU(double);
 // Register the GPU kernels.
 #ifdef GOOGLE_CUDA
 #define REGISTER_GPU(T)                                                        \
-  extern template struct MonmentLambdaFunctor<GPUDevice, T>;                          \
+  extern template struct MonmentLambdaFunctor<GPUDevice, T>;                   \
   REGISTER_KERNEL_BUILDER(                                                     \
-      Name("MonmentLambda").Device(DEVICE_GPU).TypeConstraint<T>("T"),                \
+      Name("MonmentLambda").Device(DEVICE_GPU).TypeConstraint<T>("T"),         \
       MonmentLambdaOp<GPUDevice, T>);
 REGISTER_GPU(float);
 REGISTER_GPU(double);
 #undef REGISTER_GPU
 #endif // GOOGLE_CUDA
 
-
 // Register the CPU kernels.
 #define REGISTER_CPU(T)                                                        \
   REGISTER_KERNEL_BUILDER(                                                     \
-      Name("MonmentLambdaGradient").Device(DEVICE_CPU).TypeConstraint<T>("T"),                \
+      Name("MonmentLambdaGradient").Device(DEVICE_CPU).TypeConstraint<T>("T"), \
       MonmentLambdaGradOp<CPUDevice, T>);
 
 REGISTER_CPU(float);
@@ -140,15 +137,14 @@ REGISTER_CPU(double);
 // Register the GPU kernels.
 #ifdef GOOGLE_CUDA
 #define REGISTER_GPU(T)                                                        \
-  extern template struct MonmentLambdaGradFunctor<GPUDevice, T>;                          \
+  extern template struct MonmentLambdaGradFunctor<GPUDevice, T>;               \
   REGISTER_KERNEL_BUILDER(                                                     \
-      Name("MonmentLambdaGradient").Device(DEVICE_GPU).TypeConstraint<T>("T"),                \
+      Name("MonmentLambdaGradient").Device(DEVICE_GPU).TypeConstraint<T>("T"), \
       MonmentLambdaGradOp<GPUDevice, T>);
 REGISTER_GPU(float);
 REGISTER_GPU(double);
 #undef REGISTER_GPU
 #endif // GOOGLE_CUDA
-
 
 } // namespace functor
 } // namespace tensorflow

@@ -32,13 +32,12 @@ REGISTER_OP("SmallD")
       TF_RETURN_IF_ERROR(c->GetAttr("j", &j));
       auto shape = c->input(0);
       auto seq_length = c->Dim(shape, 0);
-      auto output_shape1 = c->MakeShape({seq_length, j+1, j+1});
-      auto output_shape2 = c->MakeShape({seq_length, j+1});
+      auto output_shape1 = c->MakeShape({seq_length, j + 1, j + 1});
+      auto output_shape2 = c->MakeShape({seq_length, j + 1});
       c->set_output(0, output_shape1);
       c->set_output(1, output_shape2);
       return STATUS_OK;
     });
-
 
 REGISTER_OP("DeltaD")
     .Attr("T: {float, double}")
@@ -65,7 +64,6 @@ REGISTER_OP("DeltaD")
       return STATUS_OK;
     });
 
-
 REGISTER_OP("MonmentLambda")
     .Attr("T: {float, double}")
     .Input("m0: T")
@@ -77,7 +75,6 @@ REGISTER_OP("MonmentLambda")
       return STATUS_OK;
     });
 
-
 REGISTER_OP("MonmentLambdaGradient")
     .Attr("T: {float, double}")
     .Input("m0: T")
@@ -88,7 +85,6 @@ REGISTER_OP("MonmentLambdaGradient")
       c->set_output(0, c->input(0));
       return STATUS_OK;
     });
-
 
 REGISTER_OP("BlattWeisskopfBarrierFactor")
     .Attr("T: {float, double}")
@@ -117,7 +113,6 @@ REGISTER_OP("BlattWeisskopfBarrierFactor")
 //       c->set_output(0, c->input(1));
 //       return Status::OK();
 // });
-
 
 // REGISTER_OP("BlattWeisskopfBarrierFactor_hess_q0")
 //     .Attr("T: {float, double}")

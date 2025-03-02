@@ -27,28 +27,36 @@ typedef Eigen::GpuDevice GPUDevice;
 
 namespace functor {
 
-template <typename T>
-T blattweisskopf_f(const T z, const int l) {
+template <typename T> T blattweisskopf_f(const T z, const int l) {
   switch (l) {
-    case 0: return 1;
-    case 1: return sqrt(z + 1);
-    case 2: return sqrt(z*(z+3)+9);
-    case 3: return sqrt(z*(z*(z+6)+45)+225);
-    case 4: return sqrt(z*(z*(z*(z+10)+135)+1575)+11025);
-    case 5: return sqrt(z*(z*(z*(z*(z+15)+315)+6300)+99225)+893025);
-    default: return 1.0;
+  case 0:
+    return 1;
+  case 1:
+    return sqrt(z + 1);
+  case 2:
+    return sqrt(z * (z + 3) + 9);
+  case 3:
+    return sqrt(z * (z * (z + 6) + 45) + 225);
+  case 4:
+    return sqrt(z * (z * (z * (z + 10) + 135) + 1575) + 11025);
+  case 5:
+    return sqrt(z * (z * (z * (z * (z + 15) + 315) + 6300) + 99225) + 893025);
+  default:
+    return 1.0;
   }
 }
 
 // CPU specialization of actual computation.
 template <typename T> struct BlattWeisskopfFunctor<CPUDevice, T> {
-  void operator()(const CPUDevice &device, const int size,const int nl,const float d, const int *l, const T *q,
-                  const T *q0, T *out) {
+  void operator()(const CPUDevice &device, const int size, const int nl,
+                  const float d, const int *l, const T *q, const T *q0,
+                  T *out) {
     for (int i = 0; i < size; ++i) {
-      auto z = pow(q[i]*d,2);
-      auto z0 = pow(q[i]*d,2);
-      for (int li =0;li<nl;li++){
-      out[i*nl +li] = blattweisskopf_f<T>(z0, l[li])/blattweisskopf_f<T>(z, l[li]);
+      auto z = pow(q[i] * d, 2);
+      auto z0 = pow(q[i] * d, 2);
+      for (int li = 0; li < nl; li++) {
+        out[i * nl + li] =
+            blattweisskopf_f<T>(z0, l[li]) / blattweisskopf_f<T>(z, l[li]);
       }
     }
   }
@@ -56,18 +64,19 @@ template <typename T> struct BlattWeisskopfFunctor<CPUDevice, T> {
 
 // OpKernel definition.
 // template parameter <T> is the datatype of the tensors.
-template <typename Device, typename T> class BlattWeisskopfOp : public OpKernel {
+template <typename Device, typename T>
+class BlattWeisskopfOp : public OpKernel {
 public:
-explicit BlattWeisskopfOp(OpKernelConstruction *context) : OpKernel(context) {
+  explicit BlattWeisskopfOp(OpKernelConstruction *context) : OpKernel(context) {
 
     OP_REQUIRES_OK(context, context->GetAttr("d", &d_));
   }
 
   void Compute(OpKernelContext *context) override {
     // Grab the input tensor
-    const Tensor &l = context->input(0); // (m,)
-    const Tensor &q = context->input(1);     // (n,)
-    const Tensor &q0 = context->input(2);     // (n,)
+    const Tensor &l = context->input(0);  // (m,)
+    const Tensor &q = context->input(1);  // (n,)
+    const Tensor &q0 = context->input(2); // (n,)
 
     int nl = l.dim_size(0);
 
@@ -82,20 +91,19 @@ explicit BlattWeisskopfOp(OpKernelConstruction *context) : OpKernel(context) {
     OP_REQUIRES(context, q.NumElements() <= tensorflow::kint32max,
                 errors::InvalidArgument("Too many elements in tensor"));
     BlattWeisskopfFunctor<Device, T>()(
-        context->eigen_device<Device>(),
-        static_cast<int>(q.NumElements()),
-        nl, d_,
-        l.flat<int>().data(), q.flat<T>().data(),
-        q0.flat<T>().data(), output_tensor->flat<T>().data());
+        context->eigen_device<Device>(), static_cast<int>(q.NumElements()), nl,
+        d_, l.flat<int>().data(), q.flat<T>().data(), q0.flat<T>().data(),
+        output_tensor->flat<T>().data());
   }
   float d_;
 };
 
 // Register the CPU kernels.
 #define REGISTER_CPU(T)                                                        \
-  REGISTER_KERNEL_BUILDER(                                                     \
-      Name("BlattWeisskopfBarrierFactor").Device(DEVICE_CPU).TypeConstraint<T>("T"),                \
-      BlattWeisskopfOp<CPUDevice, T>);
+  REGISTER_KERNEL_BUILDER(Name("BlattWeisskopfBarrierFactor")                  \
+                              .Device(DEVICE_CPU)                              \
+                              .TypeConstraint<T>("T"),                         \
+                          BlattWeisskopfOp<CPUDevice, T>);
 
 REGISTER_CPU(float);
 REGISTER_CPU(double);
@@ -104,10 +112,11 @@ REGISTER_CPU(double);
 // Register the GPU kernels.
 #ifdef GOOGLE_CUDA
 #define REGISTER_GPU(T)                                                        \
-  extern template struct BlattWeisskopfFunctor<GPUDevice, T>;                          \
-  REGISTER_KERNEL_BUILDER(                                                     \
-      Name("BlattWeisskopfBarrierFactor").Device(DEVICE_GPU).TypeConstraint<T>("T"),                \
-      BlattWeisskopfOp<GPUDevice, T>);
+  extern template struct BlattWeisskopfFunctor<GPUDevice, T>;                  \
+  REGISTER_KERNEL_BUILDER(Name("BlattWeisskopfBarrierFactor")                  \
+                              .Device(DEVICE_GPU)                              \
+                              .TypeConstraint<T>("T"),                         \
+                          BlattWeisskopfOp<GPUDevice, T>);
 REGISTER_GPU(float);
 REGISTER_GPU(double);
 #undef REGISTER_GPU
