@@ -31,3 +31,8 @@ make
 ```
 pip install -e . --no-deps
 ```
+
+Acknowledge
+-----------
+
+This work starts at OpenACC GPU Hackathon China 2021@CCNU, thanks the guidance of the group.
