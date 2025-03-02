@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, gpu]
     strategy:
       max-parallel: 5
     defaults:
@@ -18,7 +18,7 @@ jobs:
         python-version: 3.11
     - name: Install dependencies
       run: |
-        conda install tensorflow[build=cuda*] cuda-minimal-build
+        conda install tensorflow cuda-minimal-build
     - name: build so file
       run: |
         mkdir build
