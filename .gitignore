@@ -1,6 +1,7 @@
 build
 dist
 third_party
+.py-build-cmake_cache
 *.so
 
 *.egg-info

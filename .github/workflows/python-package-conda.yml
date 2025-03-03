@@ -21,20 +21,14 @@ jobs:
     - name: Install dependencies
       run: |
         conda install tensorflow cuda-minimal-build
-    - name: set gpu link to build without gpu
+    - name: set gpulib link to build without gpu
       run: |
         mkdir -p third_party/gpus/cuda/
         ln -s $(dirname `which python`)/../targets/x86_64-linux/include third_party/gpus/cuda/include
-    - name: build so file
-      run: |
-        mkdir build
-        cd build
-        cmake ..
-        make
-        cd ..
     - name: build whl
       run: |
-        python setup.py bdist_wheel
+        conda install python-build py-build-cmake -c conda-forge
+        python -m build --no-isolation --skip-dependency-check --wheel
     - uses: actions/upload-artifact@v4
       with:
         name: artifact-py${{ matrix.python-version }}
