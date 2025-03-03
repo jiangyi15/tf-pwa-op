@@ -20,6 +20,7 @@ using namespace tensorflow;
 
 // start from tf 2.10
 #define STATUS_OK OkStatus()
+// #define STATUS_OK Status::OK()
 
 REGISTER_OP("SmallD")
     .Attr("T: {float, double}")
