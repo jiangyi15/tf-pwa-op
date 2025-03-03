@@ -23,14 +23,16 @@ from setuptools import setup
 from setuptools.dist import Distribution
 
 
-__version__ = '0.0.1'
+__version__ = "0.0.1"
 REQUIRED_PACKAGES = [
-    'tensorflow >= 2.1.0',
+    "tensorflow >= 2.1.0",
 ]
-project_name = 'tf_pwa_op'
+project_name = "tf_pwa_op"
 
 
 from setuptools.command.install import install
+
+
 class InstallPlatlib(install):
     def finalize_options(self):
         install.finalize_options(self)
@@ -38,20 +40,21 @@ class InstallPlatlib(install):
 
 
 class BinaryDistribution(Distribution):
-  """This class is needed in order to create OS specific wheels."""
+    """This class is needed in order to create OS specific wheels."""
 
-  def has_ext_modules(self):
-    return True
+    def has_ext_modules(self):
+        return True
 
-  def is_pure(self):
-    return False
+    def is_pure(self):
+        return False
+
 
 setup(
     name=project_name,
     version=__version__,
-    description=('tensorflow ops for TFPWA'),
-    author='Yi Jiang',
-    author_email='jiangyi15@mails.ucas.ac.cn',
+    description=("tensorflow ops for TFPWA"),
+    author="Yi Jiang",
+    author_email="jiangyi15@mails.ucas.ac.cn",
     # Contained modules and scripts.
     packages=find_packages(),
     install_requires=REQUIRED_PACKAGES,
@@ -59,21 +62,21 @@ setup(
     include_package_data=True,
     zip_safe=False,
     distclass=BinaryDistribution,
-    cmdclass={'install': InstallPlatlib},
+    cmdclass={"install": InstallPlatlib},
     # PyPI package information.
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Education',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Topic :: Scientific/Engineering :: Mathematics',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Software Development :: Libraries',
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Topic :: Scientific/Engineering :: Mathematics",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Software Development :: Libraries",
     ],
-    license='Apache 2.0',
-    keywords='tensorflow custom op machine learning',
+    license="Apache 2.0",
+    keywords="tensorflow custom op machine learning",
 )

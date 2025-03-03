@@ -16,4 +16,10 @@
 
 from __future__ import absolute_import
 
-from tf_pwa_op.python.ops.small_d_ops import small_d, delta_D, get_relative_p, get_relative_p2, blattweisskopf
+from tf_pwa_op.python.ops.small_d_ops import (
+    small_d,
+    delta_D,
+    get_relative_p,
+    get_relative_p2,
+    blattweisskopf,
+)
