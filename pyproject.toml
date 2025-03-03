@@ -31,7 +31,7 @@ requires = ["py-build-cmake~=0.4.2", "tensorflow"]
 build-backend = "py_build_cmake.build"
 
 [tool.py-build-cmake.sdist] # What to include in source distributions
-include = ["CMakeLists.txt", "tf_pwa_op/cc"]
+include = ["CMakeLists.txt", "tf_pwa_op/python/ops/*.so"]
 
 [tool.py-build-cmake.cmake] # How to build the CMake project
 build_type = "RelWithDebInfo"

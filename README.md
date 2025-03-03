@@ -1,8 +1,13 @@
 TensorFlow op for TFPWA
 ========================
 
-Build
------
+
+Build when install
+------------------
+
+
+Build in local
+--------------
 
 0. set up enviromant
 
@@ -15,24 +20,19 @@ conda activate tf_pwa_op
 
 ```
 conda install tensorflow cuda-minimal-build
-```
-
-2. build so file
-
-```
-mkdir build
-cd build
-cmake ..
-make
+conda install python-build py-build-cmake
 ```
 
 3. install
 
 ```
-pip install -e . --no-deps
+git clone https://github.com/jiangyi15/tf-pwa-op && cd tf-pwa-op
+pip install -e . --no-deps --no-build-isolation
 ```
+
+you can also use `git+https://github.com/jiangyi15/tf-pwa-op` to replase the path `.`.
 
 Acknowledge
 -----------
 
-This work starts at OpenACC GPU Hackathon China 2021@CCNU, thanks the guidance of the group.
+This work starts at OpenACC GPU Hackathon China 2021@CCNU, thanks the help of the group.
